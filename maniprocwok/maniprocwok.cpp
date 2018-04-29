@@ -20,6 +20,7 @@ typedef unsigned long long POINTERSIZE;
 typedef unsigned long POINTERSIZE;
 #endif
 
+// Indicate exe is gui or cui
 bool gbGui;
 
 void ShowText(const wstring& text, bool bError)
