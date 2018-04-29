@@ -1,8 +1,10 @@
 #include "stdafx.h"
-#include <map>
+#include "../../lsMisc/stdwin32/stdwin32.h"
+
 #include "CBasePriority.h"
 
 using namespace std;
+using namespace stdwin32;
 
 struct SSS {
 	wstring s_;
@@ -73,6 +75,6 @@ DWORD CBasePriority::getPriority(const wstring& basepriority, wstring& error)
 		if (sBasePriorities[i].s_ == basepriority)
 			return sBasePriorities[i].d_;
 	}
-	error = I18NS(L"BasePriorty not found");
+	error = string_format(I18NS(L"BasePriorty '%s' not found"), basepriority.c_str());
 	return 0;
 }

@@ -45,6 +45,9 @@
     <ClInclude Include="CBasePriority.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\lsMisc\stdwin32\stdwin32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CBasePriority.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lsMisc\stdwin32\stdwin32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
