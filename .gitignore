@@ -1,4 +1,11 @@
+__OUT__/
 .vs/
 Debug/
 build/
 *.user
+
+maniproc/Win32/
+maniproc/x64/
+maniprocwok/Win32/
+maniprocwok/x64/
+
