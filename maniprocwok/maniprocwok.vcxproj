@@ -96,9 +96,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;MANIPROCWOK_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include;.;..\processhacker\phnt\include;..\processhacker\phlib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include;.;$(SolutionDir)..\processhacker\phnt\include;$(SolutionDir)..\processhacker\phlib\include</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
-      <AdditionalOptions>/Zc:strictStrings- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -113,9 +112,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;MANIPROCWOK_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include;.;..\processhacker\phnt\include;..\processhacker\phlib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include;.;$(SolutionDir)..\processhacker\phnt\include;$(SolutionDir)..\processhacker\phlib\include</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
-      <AdditionalOptions>/Zc:strictStrings- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -132,9 +130,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;MANIPROCWOK_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include;.;..\processhacker\phnt\include;..\processhacker\phlib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include;.;$(SolutionDir)..\processhacker\phnt\include;$(SolutionDir)..\processhacker\phlib\include</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
-      <AdditionalOptions>/Zc:strictStrings- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,9 +150,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;MANIPROCWOK_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include;.;..\processhacker\phnt\include;..\processhacker\phlib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include;.;$(SolutionDir)..\processhacker\phnt\include;$(SolutionDir)..\processhacker\phlib\include</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
-      <AdditionalOptions>/Zc:strictStrings- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
