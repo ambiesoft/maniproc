@@ -1,0 +1,33 @@
+{
+    "name": "maniproc",
+    "solution": "maniproc.sln",
+    "targetproject": "zzzDist",
+    "configuration": "zzzDist",
+    "targets": [
+        {
+            "outdir": "C:\\Linkout\\maniproc\\",
+            "setoutdirforbuild": true,
+            "platform": "x86"
+        },
+        {
+            "outdir": "C:\\Linkout\\maniproc64\\",
+            "setoutdirforbuild": true,
+            "platform": "x64"
+        }
+    ],
+    "ShouldBeFiles": [
+        "History.txt",
+        "maniproc.exe",
+        "maniprocw.exe",
+        "maniprocwok.dll",
+        "README.md"
+    ],
+    "TotalFileCount": "exact",
+    "archivedir": "C:\\Linkout",
+    "remotedir": "http://ambiesoft.fam.cx/ffdav/uploads/maniproc/",
+    "remotesha1" : "http://ambiesoft.fam.cx/ffdav/uploads/getSha1.php?file=maniproc/{}",
+    "ShouldNotBeFiles": [],
+    "ShouldBeOneOfThem": [],
+    "obtainverfrom": "History.txt",
+    "obtainverregex": "\\d+\\.\\d+"
+}

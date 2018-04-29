@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="zzzDist.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="dist">
+      <UniqueIdentifier>{6f132f4b-0526-4e5c-88e7-ccebaba6e9a6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="History.txt">
+      <Filter>dist</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
