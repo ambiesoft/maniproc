@@ -5,121 +5,16 @@
 
 // #include <phnt_ntdef.h>
 
-#include "../../lsMisc/CommandLineParser.h"
-#include "../../lsMisc/CreateProcessCommon.h"
-#include "../../lsMisc/GetLastErrorString.h"
+
 #include "Macro.h"
 #include "CBasePriority.h"
+#include "global.h"
+#include "helper.h"
+#include "CJob.h"
+#include "CWmi.h"
 
 using namespace Ambiesoft;
 using namespace std;
-
-#ifdef _WIN64
-typedef unsigned long long POINTERSIZE;
-#else
-typedef unsigned long POINTERSIZE;
-#endif
-
-// Indicate exe is gui or cui
-bool gbGui;
-
-void ShowText(const wstring& text, bool bError)
-{
-	if (gbGui)
-	{
-		MessageBox(NULL, text.c_str(), APPNAME, 
-			bError ? MB_ICONERROR : MB_ICONINFORMATION);
-	}
-	else
-	{
-		if (bError)
-			wcerr << text << endl;
-		else
-			wcout << text << endl;
-	}
-}
-void ShowInfo(const wstring& text)
-{
-	ShowText(text, false);
-}
-void ShowError(const wstring& error)
-{
-	ShowText(error, true);
-}
-
-void ShowHelp(const wstring& help)
-{
-	ShowInfo(help);
-}
-void ShowVersion()
-{
-	ShowInfo(APPVERSION);
-}
-void ShowLastError(DWORD dw)
-{
-	ShowError(GetLastErrorString(dw));
-}
-void ShowNtStatusError(NTSTATUS status)
-{
-	ShowError(GetLastErrorString(status));
-}
-int SetIOPriority(HANDLE hProcess, IO_PRIORITY_HINT ioph)
-{
-	BOOLEAN success = TRUE;
-	BOOLEAN cancelled = FALSE;
-	NTSTATUS status;
-	DWORD dwProcess = GetProcessId(hProcess);
-
-	if ((POINTERSIZE)dwProcess != (POINTERSIZE)SYSTEM_PROCESS_ID)
-	{
-		status = PhSetProcessIoPriority(hProcess, ioph);
-	}
-	else
-	{
-		// See comment in PhUiSetPriorityProcesses.
-		status = STATUS_UNSUCCESSFUL;
-	}
-
-	// NtClose(hProcess);
-
-
-	//if (!NT_SUCCESS(status))
-	//{
-	//	BOOLEAN connected;
-
-	//	success = FALSE;
-
-	//	// The operation may have failed due to the lack of SeIncreaseBasePriorityPrivilege.
-	//	if (!cancelled && PhpShowErrorAndConnectToPhSvc(
-	//		NULL, //hWnd,
-	//		L"Unable to set the I/O priority",
-	//		status,
-	//		&connected
-	//	))
-	//	{
-	//		if (connected)
-	//		{
-	//			if (NT_SUCCESS(status = PhSvcCallControlProcess(Processes[i]->ProcessId, PhSvcControlProcessIoPriority, IoPriority)))
-	//				success = TRUE;
-	//			else
-	//				PhpShowErrorProcess(hWnd, L"set the I/O priority of", Processes[i], status, 0);
-
-	//			PhUiDisconnectFromPhSvc();
-	//		}
-	//		else
-	//		{
-	//			cancelled = TRUE;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		if (!PhpShowErrorProcess(hWnd, L"set the I/O priority of", Processes[i], status, 0))
-	//			break;
-	//	}
-	//}
-
-	return status;
-}
 
 int OnCmdStart(
 	const wstring& exe,
@@ -140,41 +35,31 @@ int OnCmdStart(
 		ShowLastError(dwLastError);
 		return 1;
 	}
-	
+	STLSOFT_SCOPEDFREE_HANDLE(hProcess);
+
 	if (bSetPriority)
 	{
-		if (basepriority == PROCESS_MODE_BACKGROUND_BEGIN)
-		{
-			if (!SetPriorityClass(hProcess, IDLE_PRIORITY_CLASS))
-			{
-				ShowLastError(GetLastError());
-				return 1;
-			}
-
-			NTSTATUS status = SetIOPriority(hProcess, IoPriorityVeryLow);
-			if (!NT_SUCCESS(status))
-			{
-				ShowNtStatusError(status);
-				return 1;
-			}
-
-			return 0;
-		}
-
-
-		if (!SetPriorityClass(hProcess, basepriority))
-		{
-			ShowLastError(GetLastError());
+		CPriorityJob job({ hProcess }, basepriority);
+		if (job.DoWork())
 			return 1;
-		}
 	}
+
 	return 0;
 }
+int OnCmdFind(const wstring& name)
+{
 
+	return 0;
+}
 int workmain(bool bGui)
 {
 	gbGui = bGui;
-
+	CWmi wmi;
+	if (!wmi)
+	{
+		ShowHResultError(wmi.lastError());
+		return 1;
+	}
 	// -cmd start -basepriority background -exe notepad.exe
 	// -cmd start -basepriority background -exe "C:\LegacyPrograms\Auslogics Disk Defrag\DiskDefrag.exe" -arg C:\Linkout\ 
 
@@ -199,6 +84,13 @@ int workmain(bool bGui)
 		&arg,
 		ArgEncodingFlags_Default,
 		I18NS(L"Command line argument for starting executable"));
+
+	wstring name;
+	parser.AddOption(L"-name",
+		1,
+		&name,
+		ArgEncodingFlags_Default,
+		I18NS(L"Filename to find processes"));
 
 	wstring basepriority;
 	parser.AddOption(L"-basepriority",
@@ -268,6 +160,10 @@ int workmain(bool bGui)
 			bSetPriority = true;
 		}
 		return OnCmdStart(exe, arg, bSetPriority, dwPriority);
+	}
+	else if (cmd.empty() || cmd == L"find")
+	{
+		return OnCmdFind(name);
 	}
 	if (!opExe.hadValue())
 	{

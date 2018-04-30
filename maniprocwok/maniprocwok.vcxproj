@@ -169,6 +169,10 @@
     <ClInclude Include="..\..\lsMisc\UTF16toUTF8.h" />
     <ClInclude Include="..\common\Header.h" />
     <ClInclude Include="CBasePriority.h" />
+    <ClInclude Include="CJob.h" />
+    <ClInclude Include="CWmi.h" />
+    <ClInclude Include="global.h" />
+    <ClInclude Include="helper.h" />
     <ClInclude Include="Macro.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -181,7 +185,11 @@
     <ClCompile Include="..\..\lsMisc\UrlEncode.cpp" />
     <ClCompile Include="..\..\lsMisc\UTF16toUTF8.cpp" />
     <ClCompile Include="CBasePriority.cpp" />
+    <ClCompile Include="CJob.cpp" />
+    <ClCompile Include="CWmi.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="global.cpp" />
+    <ClCompile Include="helper.cpp" />
     <ClCompile Include="maniprocwok.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
