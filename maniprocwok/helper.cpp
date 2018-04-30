@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "global.h"
-
+#include <sstream>
 using namespace std;
 using namespace Ambiesoft;
 
@@ -46,5 +46,15 @@ void ShowNtStatusError(NTSTATUS status)
 }
 void ShowHResultError(HRESULT hr)
 {
-	ShowError(GetLastErrorString(hr));
+	_com_error err(hr);
+	wstring message = err.ErrorMessage();
+
+	// wstring message = GetLastErrorString(hr);
+	if (message.empty())
+	{
+		wstringstream ws;
+		ws << I18NS(L"Unknown error") << " 0x" << std::hex << hr;
+		message = ws.str();
+	}
+	ShowError(message);
 }

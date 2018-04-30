@@ -67,34 +67,31 @@ int SetIOPriority(HANDLE hProcess, IO_PRIORITY_HINT ioph)
 
 bool SetPriority(HANDLE hProcess, DWORD basepriority)
 {
-	
+	if (basepriority == PROCESS_MODE_BACKGROUND_BEGIN)
 	{
-		if (basepriority == PROCESS_MODE_BACKGROUND_BEGIN)
-		{
-			if (!SetPriorityClass(hProcess, IDLE_PRIORITY_CLASS))
-			{
-				ShowLastError(GetLastError());
-				return 1;
-			}
-
-			NTSTATUS status = SetIOPriority(hProcess, IoPriorityVeryLow);
-			if (!NT_SUCCESS(status))
-			{
-				ShowNtStatusError(status);
-				return 1;
-			}
-
-			return 0;
-		}
-
-
-		if (!SetPriorityClass(hProcess, basepriority))
+		if (!SetPriorityClass(hProcess, IDLE_PRIORITY_CLASS))
 		{
 			ShowLastError(GetLastError());
-			return 1;
+			return false;
 		}
+
+		NTSTATUS status = SetIOPriority(hProcess, IoPriorityVeryLow);
+		if (!NT_SUCCESS(status))
+		{
+			ShowNtStatusError(status);
+			return false;
+		}
+		return true;
 	}
+
+	if (!SetPriorityClass(hProcess, basepriority))
+	{
+		ShowLastError(GetLastError());
+		return false;
+	}
+	return true;
 }
+
 bool CPriorityJob::DoWork()
 {
 	int failcount = 0;

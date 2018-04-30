@@ -16,11 +16,11 @@
 using namespace Ambiesoft;
 using namespace std;
 
-int OnCmdStart(
+bool OnCmdStart(
 	const wstring& exe,
 	const wstring& arg,
-	bool bSetPriority,
-	DWORD basepriority)
+	HANDLE* phHandle,
+	wstring& error)
 {
 	DWORD dwLastError = 0;
 	HANDLE hProcess = NULL;
@@ -32,36 +32,27 @@ int OnCmdStart(
 		0,
 		&hProcess))
 	{
-		ShowLastError(dwLastError);
-		return 1;
+		error = GetLastErrorString(dwLastError);
+		return false;
 	}
-	STLSOFT_SCOPEDFREE_HANDLE(hProcess);
-
-	if (bSetPriority)
-	{
-		CPriorityJob job({ hProcess }, basepriority);
-		if (job.DoWork())
-			return 1;
-	}
-
-	return 0;
+	// STLSOFT_SCOPEDFREE_HANDLE(hProcess);
+	*phHandle = hProcess;
+	return true;
 }
-int OnCmdFind(const wstring& name)
-{
 
-	return 0;
-}
 int workmain(bool bGui)
 {
 	gbGui = bGui;
 	CWmi wmi;
 	if (!wmi)
 	{
-		ShowHResultError(wmi.lastError());
+		ShowError((LPWSTR)wmi.lastError());
 		return 1;
 	}
 	// -cmd start -basepriority background -exe notepad.exe
 	// -cmd start -basepriority background -exe "C:\LegacyPrograms\Auslogics Disk Defrag\DiskDefrag.exe" -arg C:\Linkout\ 
+	// -wql "Name='notepaD.exe'" -basepriority background -limit 1
+	// X -wql "Name='notepaD.exe' Limit 1"
 
 	CCommandLineParser parser;
 	wstring cmd;
@@ -85,12 +76,26 @@ int workmain(bool bGui)
 		ArgEncodingFlags_Default,
 		I18NS(L"Command line argument for starting executable"));
 
-	wstring name;
-	parser.AddOption(L"-name",
+	//wstring name;
+	//parser.AddOption(L"-name",
+	//	1,
+	//	&name,
+	//	ArgEncodingFlags_Default,
+	//	I18NS(L"Filename to find processes"));
+
+	wstring wql;
+	parser.AddOption(L"-wql",
 		1,
-		&name,
+		&wql,
 		ArgEncodingFlags_Default,
-		I18NS(L"Filename to find processes"));
+		I18NS(L"'Where' clause of WMI sql for quering processes"));
+
+	int limit = -1;
+	parser.AddOption(L"-limit",
+		1,
+		&limit,
+		ArgEncodingFlags_Default,
+		I18NS(L"Set limit of wql results"));
 
 	wstring basepriority;
 	parser.AddOption(L"-basepriority",
@@ -106,12 +111,12 @@ int workmain(bool bGui)
 		ArgEncodingFlags_Default,
 		I18NS(L"IO Priority:") + wstring(L" ") + CBasePriority::getHelpString());
 
-	bool bShow = false;
-	parser.AddOption(L"-s",
-		0,
-		&bShow,
-		ArgEncodingFlags_Default,
-		I18NS(L"Show process information"));
+	//bool bShow = false;
+	//parser.AddOption(L"-s",
+	//	0,
+	//	&bShow,
+	//	ArgEncodingFlags_Default,
+	//	I18NS(L"Show process information"));
 
 	bool bHelp = false;
 	parser.AddOption(
@@ -144,32 +149,95 @@ int workmain(bool bGui)
 		return 0;
 	}
 
+	vector<HANDLE> handles;
+	struct HandleCloser {
+		vector<HANDLE>* hs;
+		HandleCloser(vector<HANDLE>* p)
+		{
+			hs = p;
+		}
+		~HandleCloser() {
+			for (HANDLE h : *hs)
+			{
+				CloseHandle(h);
+			}
+		}
+	} handleCloser(&handles);
+
 	if (cmd == L"start")
 	{
-		wstring error;
-		bool bSetPriority = false;
-		DWORD dwPriority = 0;
-		if (!basepriority.empty())
+		if (exe.empty() && arg.empty())
 		{
-			dwPriority = CBasePriority::getPriority(basepriority, error);
-			if (!error.empty())
-			{
-				ShowError(error);
-				return 1;
-			}
-			bSetPriority = true;
+			ShowError(I18NS(L"exe or arg must be specified to start process"));
+			return 1;
 		}
-		return OnCmdStart(exe, arg, bSetPriority, dwPriority);
+		HANDLE h = NULL;
+		wstring error;
+		if (!OnCmdStart(exe, arg, &h, error))
+		{
+			ShowError(error);
+			return 1;
+		}
+		handles.push_back(h);
 	}
 	else if (cmd.empty() || cmd == L"find")
 	{
-		return OnCmdFind(name);
+		if (wql.empty())
+		{
+			ShowError(I18NS(L"No wql specified"));
+			return 1;
+		}
+		if (!wmi.GetProcesses(handles, wql, limit))
+		{
+			wstring error = I18NS(L"Failed to get processes.");
+			error += L"\r\n\r\n";
+			error += (LPCWSTR)wmi.lastError();
+			ShowError(error);
+			return 1;
+		}
 	}
-	if (!opExe.hadValue())
+
+	// handles found, now do action
+	if (handles.empty())
 	{
-		ShowError(I18NS(L"No target specified"));
-		return 1;
+		ShowInfo(I18NS(L"No processes found"));
+		return 0;
 	}
+
+	bool actionTaken = false;
+	wstring error;
+	bool bSetPriority = false;
+	DWORD dwPriority = 0;
+	if (!basepriority.empty())
+	{
+		dwPriority = CBasePriority::getPriority(basepriority, error);
+		if (!error.empty())
+		{
+			ShowError(error);
+			return 1;
+		}
+		bSetPriority = true;
+	}
+
+	if (bSetPriority)
+	{
+		CPriorityJob job(handles, dwPriority);
+		if (!job.DoWork())
+			return 1;
+
+		actionTaken = true;
+	}
+
+	if (!actionTaken)
+	{
+		ShowInfo(I18NS(L"No action specified"));
+		return 0;
+	}
+	//if (!opExe.hadValue())
+	//{
+	//	ShowError(I18NS(L"No target specified"));
+	//	return 1;
+	//}
 	return 0;
 
 
