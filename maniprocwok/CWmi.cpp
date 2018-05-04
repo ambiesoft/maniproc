@@ -90,7 +90,8 @@ void CWmi::SetError(HRESULT hr)
 bool CWmi::GetProcesses(
 	std::vector<HANDLE>& handles,
 	const wstring& where,
-	int limit)
+	int limit,
+	bool& needUac)
 {
 	if (!pSvc_)
 		return false;
@@ -159,7 +160,9 @@ bool CWmi::GetProcesses(
 			id);
 		if (!h)
 		{
-			continue;
+			needUac = true;
+			SetError(GetLastError());
+			return false;
 		}
 		handles.push_back(h);
 	}

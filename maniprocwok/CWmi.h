@@ -31,6 +31,7 @@ public:
 	bool GetProcesses(
 		std::vector<HANDLE>& handles, 
 		const std::wstring& query,
-		int limit);
+		int limit,
+		bool& needUac);
 };
 

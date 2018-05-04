@@ -162,8 +162,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\lsMisc\CommandLineParser.h" />
+    <ClInclude Include="..\..\lsMisc\CommandLineString.h" />
     <ClInclude Include="..\..\lsMisc\CreateProcessCommon.h" />
     <ClInclude Include="..\..\lsMisc\GetLastErrorString.h" />
+    <ClInclude Include="..\..\lsMisc\OpenCommon.h" />
     <ClInclude Include="..\..\lsMisc\stdwin32\stdwin32.h" />
     <ClInclude Include="..\..\lsMisc\UrlEncode.h" />
     <ClInclude Include="..\..\lsMisc\UTF16toUTF8.h" />
@@ -181,6 +183,7 @@
     <ClCompile Include="..\..\lsMisc\CommandLineParser.cpp" />
     <ClCompile Include="..\..\lsMisc\CreateProcessCommon.cpp" />
     <ClCompile Include="..\..\lsMisc\GetLastErrorString.cpp" />
+    <ClCompile Include="..\..\lsMisc\OpenCommon.cpp" />
     <ClCompile Include="..\..\lsMisc\stdwin32\stdwin32.cpp" />
     <ClCompile Include="..\..\lsMisc\UrlEncode.cpp" />
     <ClCompile Include="..\..\lsMisc\UTF16toUTF8.cpp" />

@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 
+
 // #include <phnt_ntdef.h>
 
 
@@ -111,6 +112,13 @@ int workmain(bool bGui)
 		ArgEncodingFlags_Default,
 		I18NS(L"IO Priority:") + wstring(L" ") + CBasePriority::getHelpString());
 
+	bool uac = false;
+	parser.AddOption(L"-uac",
+		0,
+		&uac,
+		ArgEncodingFlags_Default,
+		I18NS(L"Elevate to administrator if neccessary"));
+
 	//bool bShow = false;
 	//parser.AddOption(L"-s",
 	//	0,
@@ -187,8 +195,26 @@ int workmain(bool bGui)
 			ShowError(I18NS(L"No wql specified"));
 			return 1;
 		}
-		if (!wmi.GetProcesses(handles, wql, limit))
+		bool needUac = false;
+		if (!wmi.GetProcesses(handles, wql, limit, needUac))
 		{
+			if (needUac && uac)
+			{
+				wstring me, mearg;
+				CCommandLineString::ExplodeExeAndArg(GetCommandLine(), me, mearg);
+
+				if (!OpenCommon(NULL,
+					me.c_str(),
+					mearg.c_str(),
+					NULL,
+					NULL,
+					L"runas"))
+				{
+					ShowError(L"Failed to launch myself as administrator.");
+					return 1;
+				}
+				return 0;
+			}
 			wstring error = I18NS(L"Failed to get processes.");
 			error += L"\r\n\r\n";
 			error += (LPCWSTR)wmi.lastError();
